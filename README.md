@@ -83,32 +83,42 @@ That's it! No authentication, no keys, just free AI. 🎉
 
 ## 🚀 Deploy to Cloudflare Pages (Step-by-Step)
 
-### Method 1: Direct Upload (Easiest)
+### ⚠️ IMPORTANT: App not opening? Common fixes:
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+- Make sure you're deploying the `dist/` folder, NOT the root folder
+- If using direct upload, upload the contents of `dist/` folder
+
+### Method 1: Direct Upload (Easiest - No Build Needed!)
 
 1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
-2. Navigate to **Workers & Pages** → **Create**
-3. Select **Pages** → **Upload assets**
+2. Navigate to **Workers & Pages** → **Create application** → **Pages**
+3. Select **Upload assets** (direct upload)
 4. Name your project: `chetar-ai`
-5. Upload the `dist/` folder (or the root files if using static HTML)
+5. **Upload the `dist/` folder contents** (index.html, favicon.svg, _headers, _redirects)
 6. Click **Deploy Site**
-7. Done! 🎉
+7. Done! 🎉 Your app is live!
 
-### Method 2: GitHub Integration
+### Method 2: GitHub Integration (Auto-deploy on push)
 
-1. Fork/Clone this repo
-2. Go to Cloudflare Dashboard → **Workers & Pages** → **Create**
+1. Push this repo to GitHub
+2. Go to Cloudflare Dashboard → **Workers & Pages** → **Create application**
 3. Select **Pages** → **Connect to Git**
 4. Connect your GitHub account
 5. Select this repository
-6. Configure build settings:
+6. **Configure build settings EXACTLY:**
+   - **Framework preset:** None
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
+   - **Root directory:** `/` (leave as default)
 7. Click **Save and Deploy**
+8. Wait for build to complete (~30 seconds)
 
 ### Method 3: Cloudflare CLI (Wrangler)
 
 ```bash
 npm install -g wrangler
+wrangler login
 wrangler pages deploy dist --project-name=chetar-ai
 ```
 
@@ -116,19 +126,29 @@ wrangler pages deploy dist --project-name=chetar-ai
 
 ## 🌐 Add Custom Domain
 
-1. Go to your Cloudflare Pages project
+1. Go to your Cloudflare Pages project dashboard
 2. Click **Custom domains** tab
 3. Click **Set up a custom domain**
-4. Enter your domain (e.g., `chetar.ai`)
-5. Cloudflare will give you DNS records to add
-6. Add a **CNAME** record pointing to your project:
-   ```
-   Type: CNAME
-   Name: chetar.yourdomain.com
-   Target: chetar-ai.pages.dev
-   ```
-7. Wait for DNS propagation (usually 5-10 minutes)
+4. Enter your domain (e.g., `chetar.yourdomain.com`)
+5. If your domain is on Cloudflare already:
+   - It will auto-configure DNS
+   - Just click **Activate domain**
+6. If domain is on another provider (GoDaddy, Namecheap, etc.):
+   - Add a **CNAME** record:
+     ```
+     Type: CNAME
+     Name: chetar (or @)
+     Target: chetar-ai.pages.dev
+     ```
+   - Or add an **A** record with Cloudflare's IPs
+7. Wait for DNS propagation (5 mins to 24 hours)
 8. SSL certificate is auto-provisioned by Cloudflare! 🔒
+
+### If app shows blank page after custom domain:
+- Check browser console (F12) for errors
+- Make sure Cloudflare Pages build completed successfully
+- Try hard refresh (Ctrl+Shift+R)
+- Check that `dist/` folder has `index.html`
 
 ---
 
