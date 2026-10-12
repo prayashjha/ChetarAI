@@ -1,752 +1,359 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chetar AI - Free AI Chat & Image Generator | Soch Se Zyada</title>
-    <meta name="description" content="Chetar AI - Free AI chat and image generation app. No API key needed. Powered by Pollinations AI. Soch Se Zyada!">
-    <meta name="keywords" content="Chetar AI, free AI chat, AI image generator, Pollinations AI, free chatbot">
-    <meta name="author" content="Prayash">
-    
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Chetar AI - Free AI Chat & Image Generator">
-    <meta property="og:description" content="Soch Se Zyada! Free AI chat and image generation. No API key needed.">
-    
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Chetar AI - Free AI Chat & Image Generator">
-    <meta name="twitter:description" content="Soch Se Zyada! Free AI chat and image generation.">
-    
-    <meta name="theme-color" content="#4285f4">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    animation: {
-                        'fade-in': 'fadeIn 0.3s ease-out',
-                        'bounce-slow': 'bounce 1s infinite',
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Marked.js for Markdown -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
-    <!-- Highlight.js for code blocks -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/core.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/javascript.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/python.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/css.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/xml.min.js"></script>
-    
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-        
-        /* Custom scrollbar */
-        .scrollbar-thin::-webkit-scrollbar { width: 4px; }
-        .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-        .scrollbar-thin::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-        .dark .scrollbar-thin::-webkit-scrollbar-thumb { background: #4b5563; }
-        
-        /* Markdown styles */
-        .markdown-body h1 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .markdown-body h2 { font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .markdown-body h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
-        .markdown-body p { margin-bottom: 0.5rem; line-height: 1.625; }
-        .markdown-body p:last-child { margin-bottom: 0; }
-        .markdown-body ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.5rem; }
-        .markdown-body ol { list-style: decimal; padding-left: 1.25rem; margin-bottom: 0.5rem; }
-        .markdown-body li { margin-bottom: 0.25rem; }
-        .markdown-body code:not(pre code) { 
-            background: #f3f4f6; padding: 0.125rem 0.375rem; border-radius: 0.25rem; 
-            font-size: 0.875rem; font-family: monospace; 
-        }
-        .dark .markdown-body code:not(pre code) { background: #374151; }
-        .markdown-body pre { 
-            margin: 0.75rem 0; border-radius: 0.5rem; overflow: hidden; 
-        }
-        .markdown-body pre code { 
-            display: block; padding: 1rem; overflow-x: auto; font-size: 0.875rem; 
-        }
-        .markdown-body blockquote { 
-            border-left: 3px solid #4285f4; padding-left: 1rem; 
-            color: #6b7280; margin: 0.5rem 0; 
-        }
-        .markdown-body a { color: #4285f4; text-decoration: underline; }
-        .markdown-body table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
-        .markdown-body th, .markdown-body td { border: 1px solid #e5e7eb; padding: 0.5rem; text-align: left; }
-        .dark .markdown-body th, .dark .markdown-body td { border-color: #4b5563; }
-        
-        /* Mobile sidebar overlay */
-        @media (max-width: 768px) {
-            #sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100%;
-                z-index: 50;
-                box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-            }
-            #sidebarOverlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.3);
-                z-index: 40;
-            }
-            #sidebarOverlay.active {
-                display: block;
-            }
-        }
-        @media (min-width: 769px) {
-            #sidebarOverlay { display: none !important; }
-        }
-        
-        /* Textarea */
-        textarea { resize: none; }
-        textarea:focus { outline: none; }
-        
-        /* Typing cursor */
-        .typing-cursor::after {
-            content: '▊';
-            animation: blink 1s step-end infinite;
-            color: #4285f4;
-        }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chetar AI – Free AI Chat &amp; Image Generator | ToolsX</title>
+<meta name="description" content="Chetar AI ek free AI chat aur image generator hai. Koi API key ya signup nahi chahiye. Hindi, Hinglish aur English me sawal poochho aur images banao.">
+<meta name="author" content="Prayash Jha">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#4285f4">
+<link rel="canonical" href="https://chetar.toolsx.in/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ToolsX">
+<meta property="og:title" content="Chetar AI – Free AI Chat &amp; Image Generator">
+<meta property="og:description" content="Free AI chat aur image generation. Koi API key nahi chahiye.">
+<meta property="og:url" content="https://chetar.toolsx.in/">
+<meta property="og:image" content="https://chetar.toolsx.in/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Chetar AI – Free AI Chat &amp; Image Generator">
+<meta name="twitter:description" content="Free AI chat aur image generation. Koi API key nahi chahiye.">
+<meta name="twitter:image" content="https://chetar.toolsx.in/og.png">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"WebApplication","name":"Chetar AI","url":"https://chetar.toolsx.in/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","inLanguage":["hi","en"],"description":"Free AI chat and image generator powered by Pollinations AI.","author":{"@type":"Person","name":"Prayash Jha"},"offers":{"@type":"Offer","price":"0","priceCurrency":"INR"}},
+{"@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"ToolsX","item":"https://toolsx.in/"},
+{"@type":"ListItem","position":2,"name":"Chetar AI","item":"https://chetar.toolsx.in/"}]},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Kya Chetar AI free hai?","acceptedAnswer":{"@type":"Answer","text":"Haan, Chetar AI use karne ke liye signup ya API key nahi chahiye."}},
+{"@type":"Question","name":"Mera data kahan jata hai?","acceptedAnswer":{"@type":"Answer","text":"Aapke messages aur image prompts Pollinations AI ko bheje jaate hain. Chat history sirf aapke browser me save hoti hai."}},
+{"@type":"Question","name":"Kya main images bana sakta hoon?","acceptedAnswer":{"@type":"Answer","text":"Haan, Image mode select karke prompt likho, jaise: ek sher jungle me."}},
+{"@type":"Question","name":"Chat history kaise delete karun?","acceptedAnswer":{"@type":"Answer","text":"Sidebar me Clear All Chats dabao. Ye sirf aapke browser ka data hata deta hai."}}]}
+]}
+</script>
+
+<style>
+:root{--tx-primary:#4285f4;--tx-primary-d:#2f6fd8;--tx-bg:#f6f7fb;--tx-surface:#fff;--tx-text:#1b1f2a;--tx-muted:#5f6675;--tx-border:#dfe3ec;--tx-radius:12px;--tx-shadow:0 1px 3px rgba(0,0,0,.08);--tx-danger:#d93025}
+:root[data-theme="dark"]{--tx-bg:#0f1219;--tx-surface:#181c26;--tx-text:#e8eaf0;--tx-muted:#9aa3b5;--tx-border:#2a3040;--tx-shadow:none;--tx-primary:#6ea0ff;--tx-primary-d:#8bb4ff}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--tx-bg);color:var(--tx-text)}
+a{color:var(--tx-primary)}
+:focus-visible{outline:3px solid var(--tx-primary);outline-offset:2px}
+.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:var(--tx-surface);padding:8px 12px;z-index:99}
+header.site{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--tx-surface);border-bottom:1px solid var(--tx-border);position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--tx-text);text-decoration:none}
+.logo{width:32px;height:32px;border-radius:8px;background:var(--tx-primary);color:#fff;display:grid;place-items:center;font-weight:700}
+header.site nav{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+header.site nav a{text-decoration:none;color:var(--tx-muted);padding:6px 8px;border-radius:8px}
+header.site nav a:hover{color:var(--tx-text)}
+.btn{font:inherit;border:1px solid var(--tx-border);background:var(--tx-surface);color:var(--tx-text);padding:9px 14px;border-radius:10px;cursor:pointer;min-height:44px}
+.btn:hover{border-color:var(--tx-primary)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:var(--tx-primary);border-color:var(--tx-primary);color:#fff}
+.btn.primary:hover{background:var(--tx-primary-d)}
+.btn.danger{color:var(--tx-danger)}
+.btn.sm{padding:4px 10px;min-height:32px;font-size:.85rem}
+main{max-width:980px;margin:0 auto;padding:16px}
+.breadcrumbs{font-size:.9rem;color:var(--tx-muted);margin-bottom:8px}
+.breadcrumbs a{color:var(--tx-muted)}
+.hero h1{font-size:clamp(1.5rem,4vw,2.1rem);margin:.2em 0}
+.hero p{color:var(--tx-muted);margin:0 0 16px}
+.app{background:var(--tx-surface);border:1px solid var(--tx-border);border-radius:var(--tx-radius);box-shadow:var(--tx-shadow);overflow:hidden}
+.bar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--tx-border);align-items:center}
+.bar select{font:inherit;padding:8px;border-radius:10px;border:1px solid var(--tx-border);background:var(--tx-surface);color:var(--tx-text);min-height:44px}
+.bar .spacer{flex:1}
+#log{height:min(60vh,520px);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.welcome{text-align:center;margin:auto;color:var(--tx-muted)}
+.welcome h2{color:var(--tx-text);margin:0 0 4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.chip{border:1px solid var(--tx-border);background:var(--tx-bg);color:var(--tx-text);padding:8px 14px;border-radius:999px;cursor:pointer;font:inherit;min-height:40px}
+.chip:hover{border-color:var(--tx-primary)}
+.msg{max-width:85%;padding:10px 14px;border-radius:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.user{align-self:flex-end;background:var(--tx-primary);color:#fff}
+.msg.bot{align-self:flex-start;background:var(--tx-bg);border:1px solid var(--tx-border)}
+.msg.err{border-color:var(--tx-danger);color:var(--tx-danger)}
+.msg img{max-width:100%;height:auto;border-radius:10px;display:block;margin-top:6px}
+.msg .acts{margin-top:8px;display:flex;gap:6px}
+form.send{display:flex;gap:8px;padding:10px;border-top:1px solid var(--tx-border)}
+form.send textarea{flex:1;font:inherit;padding:10px;border-radius:10px;border:1px solid var(--tx-border);background:var(--tx-surface);color:var(--tx-text);resize:none;min-height:44px;max-height:140px}
+#status{padding:0 12px 8px;font-size:.85rem;color:var(--tx-muted);min-height:1.4em}
+.notice{font-size:.9rem;color:var(--tx-muted);margin:12px 0}
+section.block{margin:28px 0}
+section.block h2{font-size:1.3rem;margin:0 0 8px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card{background:var(--tx-surface);border:1px solid var(--tx-border);border-radius:var(--tx-radius);padding:14px}
+.card h3{margin:0 0 4px;font-size:1rem}
+.card p{margin:0;color:var(--tx-muted);font-size:.95rem}
+details{background:var(--tx-surface);border:1px solid var(--tx-border);border-radius:var(--tx-radius);padding:10px 14px;margin-bottom:8px}
+summary{cursor:pointer;font-weight:600}
+footer.site{border-top:1px solid var(--tx-border);background:var(--tx-surface);padding:24px 16px;margin-top:32px}
+footer.site .in{max-width:980px;margin:0 auto;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+footer.site h3{font-size:.95rem;margin:0 0 6px}
+footer.site ul{list-style:none;margin:0;padding:0}
+footer.site li{margin:4px 0}
+footer.site .copy{max-width:980px;margin:16px auto 0;color:var(--tx-muted);font-size:.85rem}
+@media (max-width:480px){.msg{max-width:95%}header.site nav a.hide-sm{display:none}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-    
-    <!-- Mobile overlay -->
-    <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    
-    <div id="app" class="flex h-screen overflow-hidden">
-        
-        <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex flex-col transition-all duration-300 overflow-hidden">
-            <div class="p-4 flex flex-col h-full min-w-[256px]">
-                <!-- Logo -->
-                <div class="flex items-center gap-2 mb-6">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">C</div>
-                    <span class="font-semibold text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Chetar AI</span>
-                </div>
-                
-                <!-- New Chat Button -->
-                <button onclick="newChat()" class="flex items-center gap-2 w-full px-4 py-3 rounded-full border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mb-4 text-sm font-medium">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="12" y1="8" x2="12" y2="14"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
-                    New Chat
-                </button>
-                
-                <!-- Chat History -->
-                <div id="chatHistory" class="flex-1 overflow-y-auto space-y-1 scrollbar-thin"></div>
-                
-                <!-- Bottom Section -->
-                <div class="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-                    <button onclick="exportChat()" id="exportBtn" class="hidden flex items-center gap-2 w-full px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-400 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Export Chat
-                    </button>
-                    <button onclick="clearAllChats()" id="clearBtn" class="hidden flex items-center gap-2 w-full px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-500 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        Clear All Chats
-                    </button>
-                    <div class="flex items-center gap-2 px-3 py-2">
-                        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white text-xs font-bold">P</div>
-                        <span class="text-sm text-gray-600 dark:text-gray-400">Prayash</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
-        
-        <!-- Main Content -->
-        <main class="flex-1 flex flex-col h-full overflow-hidden">
-            <!-- Header -->
-            <header class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm flex-shrink-0">
-                <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                    </button>
-                    <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-                        <span class="font-medium text-sm">Chetar AI</span>
-                        <span class="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">Free</span>
-                    </div>
-                </div>
-                <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                </button>
-            </header>
-            
-            <!-- Chat Area -->
-            <div id="chatArea" class="flex-1 overflow-y-auto px-4 py-6">
-                <!-- Welcome Screen (default) -->
-                <div id="welcomeScreen" class="max-w-3xl mx-auto flex flex-col items-center justify-center h-full">
-                    <div class="text-center mb-8">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-lg">C</div>
-                        <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Namaste, Prayash</h1>
-                        <p class="text-gray-500 dark:text-gray-400 text-lg">Soch Se Zyada ✨</p>
-                    </div>
-                    
-                    <!-- Suggestion Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
-                        <button onclick="handleSuggestion('Ek interesting short story likho Hindi mein, jisme ek moral ho.')" class="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600 transition-all text-left group">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-blue-500 transition-colors flex-shrink-0"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Kahani likho</span>
-                        </button>
-                        <button onclick="handleSuggestion('Generate an image of a majestic lion in a dense green jungle, sunlight filtering through trees, photorealistic')" class="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600 transition-all text-left group">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-blue-500 transition-colors flex-shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Image banao - ek sher jungle me</span>
-                        </button>
-                        <button onclick="handleSuggestion('Mujhe JavaScript mein ek simple todo app ka code likh ke do with explanation.')" class="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600 transition-all text-left group">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-blue-500 transition-colors flex-shrink-0"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Code help karo</span>
-                        </button>
-                        <button onclick="handleSuggestion('Main ek college student hoon. Mujhe career guidance do - tech field mein kaise grow karun?')" class="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600 transition-all text-left group">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-blue-500 transition-colors flex-shrink-0"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Career advice do</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Messages Container -->
-                <div id="messagesContainer" class="max-w-3xl mx-auto hidden"></div>
-            </div>
-            
-            <!-- Input Area -->
-            <div class="px-4 pb-4 pt-2 flex-shrink-0">
-                <form onsubmit="handleSubmit(event)" class="max-w-3xl mx-auto">
-                    <div class="flex items-end gap-2 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2 border border-gray-200 dark:border-gray-700 focus-within:border-blue-400 dark:focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 dark:focus-within:ring-blue-900/30 transition-all shadow-sm">
-                        <!-- Mic Button -->
-                        <button type="button" onclick="toggleListening()" id="micBtn" class="p-2 rounded-full transition-colors flex-shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-                        </button>
-                        
-                        <!-- Text Input -->
-                        <textarea id="messageInput" placeholder="Chetar se kuch pucho..." rows="1" class="flex-1 bg-transparent border-none outline-none resize-none text-sm py-2 max-h-32 placeholder:text-gray-400 dark:placeholder:text-gray-500" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
-                        
-                        <!-- Send Button -->
-                        <button type="submit" id="sendBtn" class="p-2 rounded-full bg-blue-500 hover:bg-blue-600 disabled:opacity-30 disabled:hover:bg-blue-500 text-white transition-all flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                        </button>
-                    </div>
-                    <p class="text-center text-xs text-gray-400 dark:text-gray-500 mt-2">Chetar AI by Prayash • Free & Open Source • Powered by Pollinations AI</p>
-                </form>
-            </div>
-        </main>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site">
+  <a class="brand" href="https://toolsx.in/" aria-label="ToolsX home"><span class="logo" aria-hidden="true">X</span>ToolsX</a>
+  <nav aria-label="Main">
+    <a class="hide-sm" href="https://toolsx.in/">Home</a>
+    <a class="hide-sm" href="https://toolsx.in/">All Tools</a>
+    <button class="btn" id="themeBtn" type="button" aria-label="Toggle dark mode">🌓</button>
+  </nav>
+</header>
+
+<main id="main">
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="https://toolsx.in/">ToolsX</a> › Chetar AI</nav>
+
+  <section class="hero">
+    <h1>Chetar AI – Free AI Chat &amp; Image Generator</h1>
+    <p>Sawal poochho, kahani likhwao, code help lo ya image banao. Signup ya API key ki zarurat nahi.</p>
+  </section>
+
+  <section class="app" aria-label="Chetar AI chat">
+    <div class="bar">
+      <button class="btn" id="newBtn" type="button">New Chat</button>
+      <button class="btn" id="exportBtn" type="button">Export Chat</button>
+      <button class="btn danger" id="clearBtn" type="button">Clear All Chats</button>
+      <span class="spacer"></span>
+      <label for="mode" class="notice" style="margin:0">Mode</label>
+      <select id="mode"><option value="chat">Chat</option><option value="image">Image</option></select>
     </div>
 
-    <script>
-    // ============================================
-    // Chetar AI - Main Application Logic
-    // ============================================
-    
-    // State
-    let chats = JSON.parse(localStorage.getItem('chetar_ai_chats') || '[]');
-    let activeChatId = null;
-    let isLoading = false;
-    let darkMode = localStorage.getItem('chetar_ai_theme') === 'dark';
-    let sidebarOpen = true;
-    let isListening = false;
-    let recognition = null;
-    
-    // System prompt
-    const SYSTEM_PROMPT = `You are Chetar AI, a friendly and helpful AI assistant made by Prayash. You communicate in a warm Hinglish style (mix of Hindi and English). You are knowledgeable, creative, and always helpful.
+    <div id="log" role="log" aria-live="polite" aria-label="Conversation">
+      <div class="welcome" id="welcome">
+        <h2>Namaste 👋</h2>
+        <p>Soch Se Zyada ✨</p>
+        <div class="chips">
+          <button class="chip" type="button" data-p="Ek chhoti kahani likho" data-m="chat">Kahani likho</button>
+          <button class="chip" type="button" data-p="ek sher jungle me" data-m="image">Image banao – ek sher jungle me</button>
+          <button class="chip" type="button" data-p="JavaScript me array ko sort kaise karte hain?" data-m="chat">Code help karo</button>
+          <button class="chip" type="button" data-p="Mujhe career advice do, main 12th ke baad kya karun?" data-m="chat">Career advice do</button>
+        </div>
+      </div>
+    </div>
+    <div id="status" role="status" aria-live="polite"></div>
 
-Rules:
-- Be friendly and conversational
-- Use Hinglish naturally (Hindi + English mix)
-- If user asks for an image, photo, tasveer, or picture - include [IMAGE: detailed English prompt] in your response
-- Be concise but thorough
-- Help with coding, writing, advice, and general questions
-- Always be respectful and positive`;
-    
-    // Initialize
-    function init() {
-        if (darkMode) {
-            document.documentElement.classList.add('dark');
-            updateThemeIcon();
-        }
-        
-        // Mobile: start with sidebar closed
-        if (window.innerWidth <= 768) {
-            sidebarOpen = false;
-            document.getElementById('sidebar').style.width = '0px';
-        }
-        
-        renderChatHistory();
-        updateButtons();
+    <form class="send" id="form">
+      <label for="input" class="skip">Apna message likho</label>
+      <textarea id="input" rows="1" maxlength="2000" placeholder="Apna message likho…" autocomplete="off"></textarea>
+      <button class="btn primary" id="sendBtn" type="submit" disabled>Send</button>
+    </form>
+  </section>
+
+  <p class="notice"><strong>Privacy:</strong> Aapke messages aur image prompts third-party service <a href="https://pollinations.ai" rel="noopener noreferrer" target="_blank">Pollinations AI</a> ko bheje jaate hain. Chat history sirf aapke browser me save hoti hai. Sensitive ya personal jaankari mat likhna. AI ke jawab galat ho sakte hain.</p>
+
+  <section class="block" id="about">
+    <h2>Chetar AI kya hai?</h2>
+    <p>Chetar AI ToolsX ka ek free AI chat aur image generation app hai, jo Prayash Jha ne banaya hai. Ye Hindi, Hinglish aur English me kaam karta hai aur browser me chalta hai.</p>
+  </section>
+
+  <section class="block" id="features">
+    <h2>Features</h2>
+    <div class="grid">
+      <div class="card"><h3>AI Chat</h3><p>Kahani, code, padhai aur career ke sawal poochho.</p></div>
+      <div class="card"><h3>Image Generator</h3><p>Text prompt se image banao aur download karo.</p></div>
+      <div class="card"><h3>No Signup</h3><p>Account ya API key ke bina use karo.</p></div>
+      <div class="card"><h3>Export Chat</h3><p>Apni conversation text file me save karo.</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="how">
+    <h2>Kaise use karein</h2>
+    <ol>
+      <li>Mode select karo: Chat ya Image.</li>
+      <li>Message ya image prompt likho.</li>
+      <li>Send dabao aur jawab ka intezaar karo.</li>
+      <li>Zarurat ho to Export Chat ya image Download karo.</li>
+    </ol>
+  </section>
+
+  <section class="block" id="faq">
+    <h2>FAQ</h2>
+    <details><summary>Kya Chetar AI free hai?</summary><p>Haan, signup ya API key nahi chahiye.</p></details>
+    <details><summary>Mera data kahan jata hai?</summary><p>Messages aur prompts Pollinations AI ko bheje jaate hain. History sirf aapke browser me rehti hai.</p></details>
+    <details><summary>Kya main images bana sakta hoon?</summary><p>Haan, Image mode select karo aur prompt likho.</p></details>
+    <details><summary>Chat history kaise delete karun?</summary><p>Clear All Chats dabao. Ye sirf aapke browser ka data hatata hai.</p></details>
+  </section>
+
+  <section class="block" id="related">
+    <h2>Aur ToolsX tools</h2>
+    <p><a href="https://toolsx.in/">ToolsX par sabhi free online tools dekho →</a></p>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="in">
+    <div><h3>ToolsX</h3><p class="notice" style="margin:0">Free online tools for everyone.</p></div>
+    <div><h3>Company</h3><ul>
+      <li><a href="https://toolsx.in/p/about-prayash-jha.html">About</a></li>
+      <li><a href="https://toolsx.in/p/contact.html">Contact</a></li></ul></div>
+    <div><h3>Legal</h3><ul>
+      <li><a href="https://toolsx.in/p/privacy-policy.html">Privacy Policy</a></li>
+      <li><a href="https://toolsx.in/p/terms-and-conditions.html">Terms</a></li>
+      <li><a href="https://toolsx.in/p/disclaimer.html">Disclaimer</a></li>
+      <li><a href="https://toolsx.in/p/cookie-policy.html">Cookie Policy</a></li></ul></div>
+  </div>
+  <div class="copy">© <span id="yr">2026</span> ToolsX • Chetar AI by Prayash Jha • Powered by Pollinations AI</div>
+</footer>
+
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const log = $('log'), input = $('input'), sendBtn = $('sendBtn'), statusEl = $('status'), modeEl = $('mode');
+  const KEY = 'chetar_chat_v1', THEME = 'chetar_theme';
+  let history = [], busy = false;
+
+  $('yr').textContent = new Date().getFullYear();
+
+  // Safe storage
+  const store = {
+    get(k){ try { return localStorage.getItem(k); } catch { return null; } },
+    set(k,v){ try { localStorage.setItem(k,v); } catch {} },
+    del(k){ try { localStorage.removeItem(k); } catch {} }
+  };
+
+  // Theme
+  const applyTheme = t => document.documentElement.setAttribute('data-theme', t);
+  const saved = store.get(THEME);
+  applyTheme(saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  $('themeBtn').addEventListener('click', () => {
+    const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(t); store.set(THEME, t);
+  });
+
+  const setStatus = s => { statusEl.textContent = s || ''; };
+  const save = () => store.set(KEY, JSON.stringify(history.slice(-60)));
+
+  function addMsg(role, text, opts = {}) {
+    const w = $('welcome'); if (w) w.remove();
+    const d = document.createElement('div');
+    d.className = 'msg ' + (role === 'user' ? 'user' : 'bot') + (opts.error ? ' err' : '');
+    if (text) d.appendChild(document.createTextNode(text)); // textContent only: no XSS
+    if (opts.image) {
+      const img = document.createElement('img');
+      img.alt = opts.alt || 'Generated image';
+      img.width = 512; img.height = 512; img.loading = 'lazy';
+      img.src = opts.image;
+      img.addEventListener('error', () => { img.replaceWith(document.createTextNode('Image load nahi hui. Dobara try karo.')); setStatus(''); });
+      img.addEventListener('load', () => setStatus(''));
+      d.appendChild(img);
+      const a = document.createElement('div'); a.className = 'acts';
+      const dl = document.createElement('a');
+      dl.className = 'btn sm'; dl.href = opts.image; dl.target = '_blank'; dl.rel = 'noopener noreferrer'; dl.textContent = 'Open / Download';
+      a.appendChild(dl); d.appendChild(a);
+    } else if (role !== 'user' && !opts.error) {
+      const a = document.createElement('div'); a.className = 'acts';
+      const c = document.createElement('button'); c.type = 'button'; c.className = 'btn sm'; c.textContent = 'Copy';
+      c.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(text); c.textContent = 'Copied ✓'; } catch { c.textContent = 'Copy failed'; }
+        setTimeout(() => c.textContent = 'Copy', 1500);
+      });
+      a.appendChild(c); d.appendChild(a);
     }
-    
-    // Generate unique ID
-    function generateId() {
-        return Math.random().toString(36).substring(2) + Date.now().toString(36);
-    }
-    
-    // Save chats to localStorage
-    function saveChats() {
-        localStorage.setItem('chetar_ai_chats', JSON.stringify(chats));
-    }
-    
-    // Toggle dark mode
-    function toggleDarkMode() {
-        darkMode = !darkMode;
-        document.documentElement.classList.toggle('dark', darkMode);
-        localStorage.setItem('chetar_ai_theme', darkMode ? 'dark' : 'light');
-        updateThemeIcon();
-    }
-    
-    function updateThemeIcon() {
-        const icon = document.getElementById('themeIcon');
-        if (darkMode) {
-            icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-        } else {
-            icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-        }
-    }
-    
-    // Toggle sidebar
-    function toggleSidebar() {
-        sidebarOpen = !sidebarOpen;
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        
-        if (window.innerWidth <= 768) {
-            // Mobile: overlay mode
-            sidebar.style.width = sidebarOpen ? '256px' : '0px';
-            overlay.classList.toggle('active', sidebarOpen);
-        } else {
-            // Desktop: collapse mode
-            sidebar.style.width = sidebarOpen ? '256px' : '0px';
-        }
-    }
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            document.getElementById('sidebarOverlay').classList.remove('active');
-        }
-    });
-    
-    // New chat
-    function newChat() {
-        activeChatId = null;
-        document.getElementById('welcomeScreen').classList.remove('hidden');
-        document.getElementById('messagesContainer').classList.add('hidden');
-        document.getElementById('messagesContainer').innerHTML = '';
-        document.getElementById('messageInput').value = '';
-        document.getElementById('messageInput').focus();
-        updateButtons();
-        renderChatHistory();
-    }
-    
-    // Render chat history in sidebar
-    function renderChatHistory() {
-        const container = document.getElementById('chatHistory');
-        container.innerHTML = chats.map(chat => `
-            <div class="group flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-colors text-sm ${chat.id === activeChatId ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'}" onclick="loadChat('${chat.id}')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 opacity-50"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                <span class="truncate flex-1">${escapeHtml(chat.title)}</span>
-                <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                </button>
-            </div>
-        `).join('');
-    }
-    
-    // Load a chat
-    function loadChat(chatId) {
-        activeChatId = chatId;
-        const chat = chats.find(c => c.id === chatId);
-        if (!chat) return;
-        
-        document.getElementById('welcomeScreen').classList.add('hidden');
-        document.getElementById('messagesContainer').classList.remove('hidden');
-        
-        const container = document.getElementById('messagesContainer');
-        container.innerHTML = chat.messages.map(msg => createMessageHTML(msg)).join('');
-        
-        renderChatHistory();
-        updateButtons();
-        scrollToBottom();
-    }
-    
-    // Delete a chat
-    function deleteChat(chatId) {
-        chats = chats.filter(c => c.id !== chatId);
-        saveChats();
-        if (activeChatId === chatId) {
-            newChat();
-        }
-        renderChatHistory();
-        updateButtons();
-    }
-    
-    // Clear all chats
-    function clearAllChats() {
-        if (confirm('Sabhi chats delete karni hain?')) {
-            chats = [];
-            saveChats();
-            newChat();
-        }
-    }
-    
-    // Export chat
-    function exportChat() {
-        const chat = chats.find(c => c.id === activeChatId);
-        if (!chat) return;
-        const text = chat.messages.map(m => `[${m.role === 'user' ? 'You' : 'Chetar AI'}]: ${m.content}`).join('\n\n');
-        const blob = new Blob([text], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `chetar-chat-${chat.title.slice(0, 20)}.txt`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-    
-    // Update buttons visibility
-    function updateButtons() {
-        document.getElementById('exportBtn').classList.toggle('hidden', !activeChatId);
-        document.getElementById('clearBtn').classList.toggle('hidden', chats.length === 0);
-    }
-    
-    // Create message HTML
-    function createMessageHTML(msg) {
-        const isUser = msg.role === 'user';
-        let contentHTML = '';
-        
-        if (isUser) {
-            contentHTML = `<p class="whitespace-pre-wrap">${escapeHtml(msg.content)}</p>`;
-        } else {
-            contentHTML = `<div class="markdown-body">${marked.parse(msg.content)}</div>`;
-        }
-        
-        let imagesHTML = '';
-        if (msg.images && msg.images.length > 0) {
-            imagesHTML = `<div class="mt-2 space-y-2">${msg.images.map((img, i) => `
-                <div class="relative group rounded-xl overflow-hidden shadow-lg">
-                    <img src="${img}" alt="Generated image" class="w-full max-w-md rounded-xl" loading="lazy">
-                    <a href="${img}" download="chetar-ai-image.png" target="_blank" rel="noopener" class="absolute top-2 right-2 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    </a>
-                </div>
-            `).join('')}</div>`;
-        }
-        
-        return `
-            <div class="flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} mb-4 animate-fade-in">
-                ${!isUser ? `<div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">C</div>` : ''}
-                <div class="max-w-[80%] md:max-w-[70%] ${isUser ? 'ml-auto' : ''}">
-                    <div class="rounded-2xl px-4 py-3 ${isUser ? 'bg-blue-50 dark:bg-blue-900/30 text-gray-800 dark:text-gray-100' : 'bg-transparent text-gray-700 dark:text-gray-200'}">
-                        ${contentHTML}
-                    </div>
-                    ${imagesHTML}
-                </div>
-            </div>
-        `;
-    }
-    
-    // Handle suggestion click
-    function handleSuggestion(prompt) {
-        document.getElementById('messageInput').value = prompt;
-        handleSubmit(new Event('submit'));
-    }
-    
-    // Handle form submit
-    function handleSubmit(e) {
-        e.preventDefault();
-        const input = document.getElementById('messageInput');
-        const message = input.value.trim();
-        if (!message || isLoading) return;
-        
-        input.value = '';
-        input.style.height = 'auto';
-        sendMessage(message);
-    }
-    
-    // Handle key down
-    function handleKeyDown(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit(e);
-        }
-    }
-    
-    // Auto resize textarea
-    function autoResize(el) {
-        el.style.height = 'auto';
-        el.style.height = Math.min(el.scrollHeight, 128) + 'px';
-    }
-    
-    // Send message to API
-    async function sendMessage(userMessage) {
-        isLoading = true;
-        document.getElementById('sendBtn').disabled = true;
-        
-        // Create or get active chat
-        let chat;
-        if (!activeChatId) {
-            chat = {
-                id: generateId(),
-                title: userMessage.slice(0, 40) + (userMessage.length > 40 ? '...' : ''),
-                messages: [],
-                createdAt: Date.now(),
-                updatedAt: Date.now(),
-            };
-            chats.unshift(chat);
-            activeChatId = chat.id;
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            document.getElementById('messagesContainer').classList.remove('hidden');
-        } else {
-            chat = chats.find(c => c.id === activeChatId);
-        }
-        
-        // Add user message
-        const userMsg = { id: generateId(), role: 'user', content: userMessage, timestamp: Date.now() };
-        chat.messages.push(userMsg);
-        chat.updatedAt = Date.now();
-        
-        // Render user message
-        const container = document.getElementById('messagesContainer');
-        container.innerHTML += createMessageHTML(userMsg);
-        scrollToBottom();
-        
-        // Show loading indicator
-        const loadingId = 'loading-' + generateId();
-        container.innerHTML += `
-            <div id="${loadingId}" class="flex gap-3 mb-4 animate-fade-in">
-                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">C</div>
-                <div class="flex gap-1 items-center py-3">
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0ms"></div>
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:150ms"></div>
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:300ms"></div>
-                </div>
-            </div>
-        `;
-        scrollToBottom();
-        
-        // Prepare API messages
-        const apiMessages = [
-            { role: 'system', content: SYSTEM_PROMPT },
-            ...chat.messages.map(m => ({ role: m.role, content: m.content }))
-        ];
-        
-        try {
-            // Call Pollinations text API
-            const response = await fetch('https://text.pollinations.ai/openai', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: 'openai', messages: apiMessages })
-            });
-            
-            if (!response.ok) throw new Error('API Error');
-            
-            const data = await response.json();
-            let aiContent = data.choices?.[0]?.message?.content || 'Sorry, kuch galat ho gaya.';
-            
-            // Extract image prompts
-            const imageRegex = /\[IMAGE:\s*(.*?)\]/gi;
-            let imagePrompts = [];
-            let match;
-            while ((match = imageRegex.exec(aiContent)) !== null) {
-                imagePrompts.push(match[1].trim());
-            }
-            let cleanText = aiContent.replace(imageRegex, '').trim();
-            
-            // If no explicit [IMAGE] tag but implies image
-            if (imagePrompts.length === 0) {
-                const keywords = ['image', 'photo', 'tasveer', 'picture', 'banao', 'generate', 'draw', 'paint'];
-                if (keywords.some(k => userMessage.toLowerCase().includes(k))) {
-                    imagePrompts = [userMessage];
-                }
-            }
-            
-            // Generate images
-            let images = [];
-            for (const prompt of imagePrompts.slice(0, 2)) {
-                const encoded = encodeURIComponent(prompt);
-                images.push(`https://image.pollinations.ai/prompt/${encoded}?width=1024&height=1024&nologo=true&enhance=true&model=flux`);
-            }
-            
-            // Remove loading indicator
-            document.getElementById(loadingId)?.remove();
-            
-            // Create AI message
-            const aiMsg = {
-                id: generateId(),
-                role: 'assistant',
-                content: cleanText || aiContent,
-                images: images.length > 0 ? images : undefined,
-                timestamp: Date.now()
-            };
-            chat.messages.push(aiMsg);
-            chat.updatedAt = Date.now();
-            
-            // Typewriter effect
-            await typewriterEffect(cleanText || aiContent, container, aiMsg, chat.id);
-            
-        } catch (error) {
-            console.error('API Error:', error);
-            document.getElementById(loadingId)?.remove();
-            
-            const errorMsg = {
-                id: generateId(),
-                role: 'assistant',
-                content: '🙏 Chetar thoda busy hai, fir se try karo! Error: Network issue ya API down ho sakta hai.',
-                timestamp: Date.now()
-            };
-            chat.messages.push(errorMsg);
-            container.innerHTML += createMessageHTML(errorMsg);
-        }
-        
-        saveChats();
-        renderChatHistory();
-        updateButtons();
-        isLoading = false;
-        document.getElementById('sendBtn').disabled = false;
-        scrollToBottom();
-    }
-    
-    // Typewriter effect
-    async function typewriterEffect(text, container, msg, chatId) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'flex gap-3 mb-4 animate-fade-in';
-        msgDiv.innerHTML = `
-            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">C</div>
-            <div class="max-w-[80%] md:max-w-[70%]">
-                <div class="rounded-2xl px-4 py-3 bg-transparent text-gray-700 dark:text-gray-200">
-                    <div class="markdown-body typing-cursor" id="typewriter-content"></div>
-                </div>
-            </div>
-        `;
-        container.appendChild(msgDiv);
-        
-        const contentEl = document.getElementById('typewriter-content');
-        let displayed = '';
-        const chunkSize = 3;
-        
-        for (let i = 0; i < text.length; i += chunkSize) {
-            displayed = text.slice(0, i + chunkSize);
-            contentEl.innerHTML = marked.parse(displayed);
-            scrollToBottom();
-            await sleep(15);
-        }
-        
-        // Final render with full content
-        contentEl.innerHTML = marked.parse(text);
-        contentEl.classList.remove('typing-cursor');
-        contentEl.removeAttribute('id');
-        
-        // Add images if any
-        if (msg.images && msg.images.length > 0) {
-            const imagesDiv = document.createElement('div');
-            imagesDiv.className = 'mt-2 space-y-2';
-            msg.images.forEach((img, idx) => {
-                imagesDiv.innerHTML += `
-                    <div class="relative group rounded-xl overflow-hidden shadow-lg">
-                        <img src="${img}" alt="Generated image" class="w-full max-w-md rounded-xl" loading="lazy">
-                        <a href="${img}" download="chetar-ai-image.png" target="_blank" rel="noopener" class="absolute top-2 right-2 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        </a>
-                    </div>
-                `;
-            });
-            msgDiv.querySelector('.max-w-\\[80\\%\\]').appendChild(imagesDiv);
-        }
-        
-        scrollToBottom();
-    }
-    
-    // Speech recognition
-    function toggleListening() {
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            alert('Speech recognition not supported. Chrome use karo.');
-            return;
-        }
-        
-        const micBtn = document.getElementById('micBtn');
-        
-        if (isListening) {
-            recognition?.stop();
-            isListening = false;
-            micBtn.classList.remove('bg-red-100', 'dark:bg-red-900/30', 'text-red-500');
-            micBtn.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700', 'text-gray-500');
-            return;
-        }
-        
-        const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = true;
-        recognition.lang = 'hi-IN';
-        
-        recognition.onresult = (event) => {
-            const transcript = Array.from(event.results).map(r => r[0].transcript).join('');
-            document.getElementById('messageInput').value = transcript;
-        };
-        
-        recognition.onend = () => {
-            isListening = false;
-            micBtn.classList.remove('bg-red-100', 'dark:bg-red-900/30', 'text-red-500');
-            micBtn.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700', 'text-gray-500');
-        };
-        
-        recognition.onerror = () => {
-            isListening = false;
-            micBtn.classList.remove('bg-red-100', 'dark:bg-red-900/30', 'text-red-500');
-            micBtn.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700', 'text-gray-500');
-        };
-        
-        recognition.start();
-        isListening = true;
-        micBtn.classList.add('bg-red-100', 'dark:bg-red-900/30', 'text-red-500');
-        micBtn.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700', 'text-gray-500');
-    }
-    
-    // Utility functions
-    function scrollToBottom() {
-        const chatArea = document.getElementById('chatArea');
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }
-    
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-    
-    // Configure marked.js
-    marked.setOptions({
-        breaks: true,
-        gfm: true,
-        headerIds: false,
-        mangle: false,
-    });
-    
-    // Initialize app
-    init();
-    </script>
+    log.appendChild(d); log.scrollTop = log.scrollHeight;
+  }
+
+  function restore() {
+    const raw = store.get(KEY); if (!raw) return;
+    try {
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return;
+      history = arr.filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'));
+      history.forEach(m => addMsg(m.role, m.content));
+    } catch { store.del(KEY); }
+  }
+
+  async function askChat(text) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 60000);
+    try {
+      const res = await fetch('https://text.pollinations.ai/openai', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, signal: ctrl.signal,
+        body: JSON.stringify({ model: 'openai', messages: [
+          { role: 'system', content: 'You are Chetar AI, a helpful assistant by Prayash Jha. Reply in the language the user uses (Hindi, Hinglish or English). Be concise and clear.' },
+          ...history.slice(-12), { role: 'user', content: text }] })
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const out = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      if (!out) throw new Error('Empty response');
+      return String(out);
+    } finally { clearTimeout(t); }
+  }
+
+  function imageUrl(prompt) {
+    return 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=512&height=512&nologo=true&seed=' + Math.floor(Math.random() * 1e6);
+  }
+
+  async function submit(text, mode) {
+    text = text.trim(); if (!text || busy) return;
+    busy = true; sendBtn.disabled = true; input.value = ''; input.style.height = '';
+    addMsg('user', text);
+    try {
+      if (mode === 'image') {
+        setStatus('Image ban rahi hai… thoda wait karo.');
+        addMsg('assistant', '', { image: imageUrl(text), alt: text });
+      } else {
+        setStatus('Chetar AI soch raha hai…');
+        const out = await askChat(text);
+        history.push({ role: 'user', content: text }, { role: 'assistant', content: out });
+        save(); addMsg('assistant', out); setStatus('');
+      }
+    } catch (e) {
+      console.error(e);
+      addMsg('assistant', e && e.name === 'AbortError' ? 'Time out ho gaya. Dobara try karo.' : 'Kuch gadbad ho gayi. Internet check karke dobara try karo.', { error: true });
+      setStatus('');
+    } finally { busy = false; sendBtn.disabled = !input.value.trim(); input.focus(); }
+  }
+
+  $('form').addEventListener('submit', e => { e.preventDefault(); submit(input.value, modeEl.value); });
+  input.addEventListener('input', () => {
+    sendBtn.disabled = busy || !input.value.trim();
+    input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!sendBtn.disabled) $('form').requestSubmit(); }
+  });
+  document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    modeEl.value = c.dataset.m; submit(c.dataset.p, c.dataset.m);
+  }));
+
+  function reset() {
+    history = []; store.del(KEY); log.textContent = '';
+    const w = document.createElement('div'); w.className = 'welcome'; w.id = 'welcome';
+    w.innerHTML = '<h2>Namaste 👋</h2><p>Naya chat shuru karo ✨</p>';
+    log.appendChild(w); setStatus('');
+  }
+  $('newBtn').addEventListener('click', () => { if (!history.length || confirm('Naya chat shuru karein? Current chat hat jayegi.')) reset(); });
+  $('clearBtn').addEventListener('click', () => { if (confirm('Saari chat history delete karein? Ye undo nahi hoga.')) reset(); });
+  $('exportBtn').addEventListener('click', () => {
+    if (!history.length) { setStatus('Export karne ke liye koi chat nahi hai.'); return; }
+    const txt = history.map(m => (m.role === 'user' ? 'You: ' : 'Chetar AI: ') + m.content).join('\n\n');
+    const url = URL.createObjectURL(new Blob([txt], { type: 'text/plain;charset=utf-8' }));
+    const a = document.createElement('a'); a.href = url; a.download = 'chetar-ai-chat.txt';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setStatus('Chat export ho gayi.');
+  });
+
+  restore();
+})();
+</script>
 </body>
 </html>
