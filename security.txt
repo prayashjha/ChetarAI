@@ -1,4 +1,0 @@
-Contact: https://toolsx.in/p/contact.html
-Expires: 2027-10-12T00:00:00.000Z
-Preferred-Languages: en, hi
-Canonical: https://chetar.toolsx.in/.well-known/security.txt
